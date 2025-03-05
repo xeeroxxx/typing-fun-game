@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>儿童打字游戏</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Starting Screen -->
+    <div id="start-screen">
+        <h1>欢迎来到打字游戏！</h1>
+        <button id="start-button">开始</button>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" style="display: none;">
+        <div id="letter-display"></div>
+        <div id="keyboard"></div>
+        <div id="feedback"></div>
+    </div>
+
+    <!-- Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+    <!-- Game Logic -->
+    <script src="script.js"></script>
+</body>
+</html>
