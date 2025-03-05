@@ -11,6 +11,8 @@ const stages = [
 let currentStageIndex = 0;
 let currentLetterIndex = 0;
 let currentLetter = '';
+let isInputLocked = false;  // Add input lock state
+let isGameActive = false;   // Add game active state
 
 // Preload sounds (using lowercase for filenames)
 const letterSounds = {};
@@ -21,18 +23,18 @@ const celebrationSound = new Audio('sounds/celebration.mp3');
 
 // Motivational messages in Chinese with English translations
 const messages = [
-    '做得好！🎉 (Well done!)',
-    '太棒了！🌟 (Awesome!)',
-    '继续加油！💪 (Keep it up!)',
-    '你很厉害！😊 (You’re amazing!)',
-    '真聪明！🚀 (So smart!)',
-    '了不起！🏆 (Fantastic!)',
-    '超级棒！👍 (Super great!)',
-    '好厉害哦！🎈 (Really awesome!)',
-    '你是最棒的！🌈 (You’re the best!)',
-    '干得漂亮！✨ (Nicely done!)',
-    '哇，太强了！💥 (Wow, so strong!)',
-    '进步真大！🎊 (Great progress!)'
+    "做得好！🎉 (Well done!)",
+    "太棒了！🌟 (Awesome!)",
+    "继续加油！💪 (Keep it up!)",
+    "你很厉害！😊 (You're amazing!)",
+    "真聪明！🚀 (So smart!)",
+    "了不起！🏆 (Fantastic!)",
+    "超级棒！👍 (Super great!)",
+    "好厉害哦！🎈 (Really awesome!)",
+    "你是最棒的！🌈 (You're the best!)",
+    "干得漂亮！✨ (Nicely done!)",
+    "哇，太强了！💥 (Wow, so strong!)",
+    "进步真大！🎊 (Great progress!)"
 ];
 
 // QWERTY layout
@@ -54,8 +56,10 @@ function createKeyboard() {
             key.textContent = letter;
             key.dataset.letter = letter.toLowerCase();
             key.addEventListener('click', () => {
-                const event = new KeyboardEvent('keypress', { key: letter.toLowerCase() });
-                document.dispatchEvent(event);
+                if (!isInputLocked && isGameActive) {
+                    const event = new KeyboardEvent('keypress', { key: letter.toLowerCase() });
+                    document.dispatchEvent(event);
+                }
             });
             rowDiv.appendChild(key);
         });
@@ -98,7 +102,10 @@ function nextLetter() {
         currentLetter = stages[currentStageIndex].letters[currentLetterIndex];
         letterDisplay.textContent = currentLetter;
         letterDisplay.classList.add('bounce');
-        setTimeout(() => letterDisplay.classList.remove('bounce'), 500);
+        setTimeout(() => {
+            letterDisplay.classList.remove('bounce');
+            isInputLocked = false;  // Unlock input after animation
+        }, 500);
         playSound(currentLetter);
         updateProgress();
     } else {
@@ -107,6 +114,7 @@ function nextLetter() {
         if (currentStageIndex < stages.length) {
             setTimeout(startStage, 3000); // Wait for celebration
         } else {
+            isGameActive = false;  // Game is complete
             document.getElementById('feedback').textContent = '游戏完成！🏆 (Game Complete!)';
         }
     }
@@ -114,16 +122,21 @@ function nextLetter() {
 
 // Celebrate stage completion
 function celebrate() {
+    isInputLocked = true;  // Lock input during celebration
     confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
     celebrationSound.play();
     const randomMessage = messages[Math.floor(Math.random() * messages.length)];
     document.getElementById('feedback').textContent = randomMessage;
-    setTimeout(() => document.getElementById('feedback').textContent = '', 3000);
+    setTimeout(() => {
+        document.getElementById('feedback').textContent = '';
+        isInputLocked = false;  // Unlock input after celebration
+    }, 3000);
 }
 
 // Start a stage
 function startStage() {
     currentLetterIndex = 0;
+    isInputLocked = false;  // Ensure input is unlocked
     updateProgress();
     nextLetter();
 }
@@ -143,15 +156,21 @@ document.getElementById('start-button').addEventListener('click', () => {
     progress.id = 'progress';
     progressBar.appendChild(progress);
     document.getElementById('game-screen').insertBefore(progressBar, document.getElementById('letter-display'));
+    isGameActive = true;  // Start the game
     createKeyboard();
     startStage();
 });
 
 // Handle keypresses
 document.addEventListener('keypress', (event) => {
+    // Ignore input if locked or game is not active
+    if (isInputLocked || !isGameActive) return;
+
     const pressedKey = event.key.toLowerCase();
     const currentLetterLower = currentLetter.toLowerCase();
+    
     if (pressedKey === currentLetterLower) {
+        isInputLocked = true;  // Lock input immediately after correct press
         document.getElementById('feedback').textContent = '✅ 好棒！🎉';
         const letterDisplay = document.getElementById('letter-display');
         letterDisplay.classList.add('correct');
@@ -164,8 +183,15 @@ document.addEventListener('keypress', (event) => {
             nextLetter();
         }, 1000);
     } else if (/^[a-z]$/.test(pressedKey)) {
-        document.getElementById('feedback').textContent = '❌ 再试一次！😊';
-        highlightKey(currentLetter);
-        setTimeout(() => document.getElementById('feedback').textContent = '', 2000);
+        // Only show error feedback if not already showing feedback
+        if (!document.getElementById('feedback').textContent) {
+            document.getElementById('feedback').textContent = '❌ 再试一次！😊';
+            highlightKey(currentLetter);
+            setTimeout(() => {
+                if (document.getElementById('feedback').textContent === '❌ 再试一次！😊') {
+                    document.getElementById('feedback').textContent = '';
+                }
+            }, 2000);
+        }
     }
 });
