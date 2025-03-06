@@ -3,10 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>儿童打字游戏</title>
+    <title>儿童打字游戏 3D</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
+    <!-- 3D Canvas Container -->
+    <div id="canvas-container"></div>
+    
     <!-- Starting Screen -->
     <div id="start-screen">
         <h1>欢迎来到打字游戏！</h1>
@@ -19,9 +23,20 @@
         <div id="keyboard"></div>
         <div id="feedback"></div>
     </div>
+    
+    <!-- Fullscreen Button -->
+    <button id="fullscreen-button" title="全屏模式">
+        <i class="fas fa-expand"></i>
+    </button>
 
-    <!-- Confetti Library -->
+    <!-- Load Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/loaders/FontLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/geometries/TextGeometry.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+    
     <!-- Game Logic -->
     <script src="script.js"></script>
 </body>
